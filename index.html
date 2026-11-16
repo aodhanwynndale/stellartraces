@@ -445,7 +445,7 @@ function persistDraft(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(conf
 
 (async function fetchExternalConfig() {
   try {
-    const res = await fetch("cobajosjis.json?v=" + Date.now());
+    const res = await fetch("editor.json?v=" + Date.now());
     if (res.ok) {
       const remoteConfig = await res.json();
       if (!loadDraftConfig()) {
@@ -831,7 +831,7 @@ function makeExportHTML(){
 function saveDraft(){readEditorFields();const ok=persistDraft();applyConfigToPage();drawMap();editorStatus.textContent=ok?"Draft saved in this browser. Export Config JSON to publish.":"Could not save local draft.";renderEditorMap();renderStarList();renderPatternSelect()}
 editorField("saveDraftBtn").addEventListener("click",saveDraft);
 editorField("exportPlayerBtn").addEventListener("click",()=>{readEditorFields();const blob=new Blob([makeExportHTML()],{type:"text/html;charset=utf-8"});downloadBlob("index.html",blob);editorStatus.textContent="Player HTML exported."});
-editorField("exportConfigBtn").addEventListener("click",()=>{readEditorFields();downloadBlob("cobajosjis.json",new Blob([serialisableConfig()],{type:"application/json;charset=utf-8"}));editorStatus.textContent="Configuration exported."});
+editorField("exportConfigBtn").addEventListener("click",()=>{readEditorFields();downloadBlob("editor.json",new Blob([serialisableConfig()],{type:"application/json;charset=utf-8"}));editorStatus.textContent="Configuration exported."});
 editorField("importConfigBtn").addEventListener("click",()=>editorField("importConfigFile").click());
 editorField("importConfigFile").addEventListener("change",async ev=>{const f=ev.target.files&&ev.target.files[0];if(!f)return;try{const v=JSON.parse(await f.text());if(!Array.isArray(v.stars)||!Array.isArray(v.acceptedPatterns))throw new Error("Invalid config");config={...structuredClone(DEFAULT_CONFIG),...v};stars=config.stars;fillEditorFields();applyConfigToPage();persistDraft();editorStatus.textContent="Config imported."}catch(e){editorStatus.textContent="Could not import config."}ev.target.value=""});
 editorField("resetConfigBtn").addEventListener("click",()=>{if(!confirm("Reset all editor changes?"))return;config=structuredClone(DEFAULT_CONFIG);stars=config.stars;answerEdges=[];selectedEditorStar=null;fillEditorFields();applyConfigToPage();persistDraft();editorStatus.textContent="Demo setup restored."});

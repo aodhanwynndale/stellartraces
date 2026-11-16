@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Stellar Traces</title>
+
+<!-- Import Google Fonts: Plus Jakarta Sans, Cormorant Garamond & Cinzel -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+@font-face {
+  font-family: 'Variable Star';
+  src: url('font/variablestar.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Cosmic';
+  src: url('font/cosmic.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+:root{
+  --night:#070914; --ink:#eeeaff; --muted:rgba(238,234,255,.48);
+  --line:rgba(255,255,255,.13); --panel:rgba(255,255,255,.035);
+  --lavender:#aaa4d8; --glow:rgba(93,82,155,.16);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--night);color:var(--ink)}
+
+/* Font standar UI Plus Jakarta Sans */
+body{font-family:'Plus Jakarta Sans', sans-serif;overflow-x:hidden}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  opacity: 0.75;
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.8) 1px, transparent 1.2px);
+  background-size: 50px 50px;
+  z-index: 0;
+}
+button{color:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible{outline:1px solid #c6c0ff;outline-offset:3px}
+.app{position:relative;z-index:1;min-height:100vh;padding:28px 24px 36px;background:radial-gradient(circle at center,rgba(93,82,155,.16),transparent 48%),#070914}
+header{text-align:center;padding:8px 0 0}
+
+/* Kicker (ASTRARIUM OBSERVATORY) Cosmic 18px */
+.kicker{font-family:'Cosmic',sans-serif;text-transform:uppercase;letter-spacing:3px;font-size:18px;color:var(--muted)}
+
+/* Eyebrow Welcome Observer 18px */
+.eyebrow{font-family:'Plus Jakarta Sans',sans-serif;text-transform:uppercase;letter-spacing:3px;font-size:18px;color:var(--muted)}
+.micro{font-family:'Plus Jakarta Sans',sans-serif;text-transform:uppercase;letter-spacing:3px;font-size:9px;color:var(--muted)}
+
+/* Jarak antarah judul lan subtitle dipotong 1/4 */
+h1 {
+  font-family: 'Variable Star', Georgia, serif;
+  font-weight: normal;
+  font-size: clamp(26px, 4vw, 42px);
+  letter-spacing: 2px;
+  line-height: 1.15;
+  margin: 10px 0 2px;
+  word-spacing: -2px;
+}
+.subtitle{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;opacity:.75;margin-top:0}
+.topline{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:23px auto 18px;font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;letter-spacing:1.5px;color:var(--muted)}
+.pip{width:4px;height:4px;border-radius:50%;background:#b7b0e8;opacity:.7}
+.panel{border:1px solid var(--line);background:var(--panel);border-radius:14px;backdrop-filter:blur(8px)}
+.welcome{width:min(560px,100%);margin:36px auto 0;padding:clamp(24px,5vw,44px);text-align:center}
+.welcome .sigil{font-size:28px;color:#c7c0ff;opacity:.8;margin-bottom:14px}
+.welcome p{font-family:'Cormorant Garamond',serif;font-size:17px;line-height:1.8;opacity:.8;max-width:390px;margin:16px auto 24px;white-space:pre-line}
+.name-wrap{max-width:340px;margin:0 auto;text-align:left}
+label{display:block;font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:9px}
+
+/* Input Name Cosmic & dilonggarne */
+input[type=text]{width:100%;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.15);border-radius:8px;padding:13px 14px;color:var(--ink);font-family:'Cosmic',sans-serif;font-size:13px;letter-spacing:1.5px}
+
+.btn{border:1px solid rgba(255,255,255,.18);background:rgba(255,255,255,.055);padding:11px 16px;border-radius:999px;font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;letter-spacing:1.6px;text-transform:uppercase;transition:background .2s,border-color .2s,transform .2s}
+.btn:hover{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.32);transform:translateY(-1px)}
+.btn.primary{background:rgba(170,164,216,.14);border-color:rgba(170,164,216,.48)}
+.btn.small{padding:8px 12px;font-size:8px}
+.btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.welcome .primary{margin-top:16px;min-width:190px}
+.fineprint{font:10px/1.6 'Plus Jakarta Sans',sans-serif;letter-spacing:.6px;color:rgba(238,234,255,.35);margin-top:22px}
+.game{display:none;width:min(1100px,100%);margin:0 auto}
+.game.active{display:block}
+.game-meta{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:22px 0 14px}
+
+/* Label Observer Cosmic */
+.player{font-size:13px;letter-spacing:1.5px;font-family:'Cosmic',sans-serif}
+.player span{font-family:'Cormorant Garamond',serif;font-style:italic;font-size:16px;opacity:.85}
+.stats{display:flex;gap:8px;flex-wrap:wrap}
+.stat{border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.025);border-radius:999px;padding:8px 12px;font-family:'Plus Jakarta Sans',sans-serif;font-size:9px;letter-spacing:1px;color:rgba(238,234,255,.72)}
+.stat strong{font-weight:normal;color:#fff;margin-left:5px}
+.section-title{text-align:center;margin:20px 0 14px}
+.section-title h2{font-family:'Cinzel',serif;font-size:25px;font-weight:normal;letter-spacing:5px;margin:0}
+.section-title p{font:9px 'Plus Jakarta Sans',sans-serif;letter-spacing:2px;text-transform:uppercase;opacity:.38;margin:8px 0 0}
+.map-shell{position:relative;width:100%;aspect-ratio:16/9;min-height:260px;border:1px solid rgba(255,255,255,.08);border-radius:18px;overflow:hidden;background:radial-gradient(ellipse at center,rgba(100,90,160,.12),transparent 62%)}
+.map-shell::before,.map-shell::after{content:"";position:absolute;border:1px solid rgba(255,255,255,.035);border-radius:50%;pointer-events:none}
+.map-shell::before{width:72%;height:72%;left:14%;top:14%;transform:rotate(18deg)}
+.map-shell::after{width:48%;height:48%;left:26%;top:26%;transform:rotate(-25deg)}
+
+/* Map Label Nampilne data saka JSON (Cosmic) */
+.map-label{position:absolute;z-index:2;top:19px;left:22px;font:11px 'Cosmic',sans-serif;letter-spacing:2px;text-transform:uppercase;opacity:.4}
+
+.map-hint{position:absolute;z-index:2;right:18px;top:18px;font:9px 'Plus Jakarta Sans',sans-serif;letter-spacing:1px;color:rgba(238,234,255,.35);text-align:right}
+#starMap{position:absolute;inset:0;width:100%;height:100%;z-index:3;touch-action:manipulation}
+.star-point{cursor:pointer;transition:filter .15s}
+.star-point:hover{filter:drop-shadow(0 0 7px currentColor) drop-shadow(0 0 16px currentColor)}
+.user-line{stroke-width:1.6;stroke-linecap:round;opacity:.86;pointer-events:stroke;cursor:pointer}
+.map-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-top:10px}
+.color-picker{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.color-picker span{font:8px 'Plus Jakarta Sans',sans-serif;letter-spacing:1.5px;text-transform:uppercase;opacity:.45;margin-right:3px}
+.swatch{width:19px;height:19px;border-radius:50%;border:1px solid rgba(255,255,255,.25);padding:0;position:relative}
+.swatch.active::after{content:"";position:absolute;inset:-4px;border:1px solid rgba(255,255,255,.65);border-radius:50%}
+
+/* URUTAN WARNA BARU: Putih -> Biru Tuwa -> Ijo -> Abang -> Kuning */
+.swatch[data-color="#ffffff"]{background:#ffffff;box-shadow:0 0 8px #ffffff}
+.swatch[data-color="#0055ff"]{background:#0055ff;box-shadow:0 0 8px #0055ff}
+.swatch[data-color="#00ff66"]{background:#00ff66;box-shadow:0 0 8px #00ff66}
+.swatch[data-color="#ff2a6d"]{background:#ff2a6d;box-shadow:0 0 8px #ff2a6d}
+.swatch[data-color="#ffe600"]{background:#ffe600;box-shadow:0 0 8px #ffe600}
+
+.controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:18px 0 0}
+.below{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+.info-card{padding:16px 18px}
+.info-card h3{font-family:'Plus Jakarta Sans',sans-serif;font-weight:normal;font-size:13px;letter-spacing:1.4px;margin:0 0 8px}
+
+/* Isi Hint & Sky Updates Cosmic */
+.info-card p{font:13px/1.8 'Cosmic',sans-serif;letter-spacing:1.2px;color:rgba(238,234,255,.75);margin:0;white-space:pre-line}
+
+.feedback{display:none;margin:0;padding:8px 0;text-align:center}
+.feedback.active{display:block}
+.result-modal-content{width:min(470px,100%);text-align:center}
+.result-modal-content .feedback h3{font-size:22px;letter-spacing:1.5px}
+.result-modal-content .feedback p{font-size:15px;white-space:pre-line}
+.result-modal-content .feedback .stamp{margin-top:12px}
+.feedback h3{font-weight:normal;font-size:18px;letter-spacing:2px;margin:0 0 7px}
+.feedback p{font:15px/1.7 'Cormorant Garamond',serif;color:rgba(238,234,255,.75);margin:0 0 14px;white-space:pre-line}
+.feedback .stamp{font:9px 'Plus Jakarta Sans',sans-serif;letter-spacing:1px;color:rgba(238,234,255,.42)}
+.footer{text-align:center;margin-top:30px;font:9px 'Plus Jakarta Sans',sans-serif;letter-spacing:2px;text-transform:uppercase;color:rgba(238,234,255,.25)}
+.modal-backdrop{position:fixed;inset:0;z-index:10;background:rgba(2,3,10,.72);display:none;align-items:center;justify-content:center;padding:20px}
+.modal-backdrop.active{display:flex}
+.modal{width:min(470px,100%);padding:26px;border:1px solid rgba(255,255,255,.15);border-radius:14px;background:linear-gradient(135deg,rgba(18,20,38,.99),rgba(9,11,21,.99));box-shadow:0 20px 70px rgba(0,0,0,.55)}
+.modal h2{font-weight:normal;font-size:22px;letter-spacing:2px;margin:0 0 14px}
+.modal p,.modal li{font:14px/1.8 'Cormorant Garamond',serif;color:rgba(238,234,255,.75)}
+.modal ul{padding-left:18px}
+.modal .btn{margin-top:12px}
+
+@media(max-width:650px){
+  .app{padding:22px 12px 28px}
+  .kicker{font-size:14px}
+  .eyebrow{font-size:14px}
+  .subtitle{font-size:13px}
+  .topline{gap:7px;font-size:8px;letter-spacing:1px}
+  .welcome{margin-top:25px;padding:25px 18px}
+  .game-meta{justify-content:center}
+  .player{width:100%;text-align:center}
+  .stats{justify-content:center}
+  .section-title h2{font-size:21px;letter-spacing:4px}
+  .map-shell{min-height:200px;aspect-ratio:16/9}
+  .map-label{top:13px;left:13px;font-size:8px;letter-spacing:2px}
+  .map-hint{top:13px;right:13px;font-size:8px}
+  .below{grid-template-columns:1fr}
+  .map-footer{justify-content:center}
+  .controls .btn{flex:1;min-width:100px}
+}
+
+/* EDITOR DESAIN MEWAH LAPANG & LUAS */
+.admin-entry{position:relative;z-index:4;display:flex;justify-content:center;margin:0 auto 8px}
+.editor-backdrop{position:fixed;inset:0;z-index:30;background:rgba(2,3,10,.92);display:none;overflow:auto;padding:16px}
+.editor-backdrop.active{display:block}
+.editor{width:min(1280px,100%);margin:0 auto;padding:20px;background:linear-gradient(135deg,rgba(18,20,38,.99),rgba(7,9,20,.99));border:1px solid rgba(255,255,255,.17);border-radius:16px;box-shadow:0 20px 70px rgba(0,0,0,.6)}
+.editor-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px;border-bottom:1px solid rgba(255,255,255,.1);padding-bottom:12px}
+.editor-head h2{font-weight:normal;letter-spacing:3px;margin:0;font-size:22px}
+.editor-map-container{margin-bottom:20px;padding:16px;border:1px solid rgba(170,164,216,.3);border-radius:14px;background:rgba(0,0,0,.3)}
+.editor-map-container h3{font-size:14px;font-weight:normal;letter-spacing:2px;margin:0 0 8px;color:#c7c0ff}
+.editor-map{width:100%;aspect-ratio:16/9;min-height:380px;position:relative;border:1px solid rgba(255,255,255,.15);border-radius:12px;overflow:hidden;background:radial-gradient(ellipse,rgba(100,90,160,.18),transparent 70%)}
+#editorMap{width:100%;height:100%;display:block;touch-action:none}
+.editor-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.editor-card{padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:rgba(255,255,255,.025);min-width:0}
+.editor-card h3{font-size:12px;font-weight:normal;letter-spacing:1.5px;margin:0 0 12px;color:#aaa4d8}
+.editor-field{margin:0 0 12px}
+.editor-field input,.editor-field textarea,.editor-field select{width:100%;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.16);border-radius:7px;padding:9px;color:var(--ink);font:12px 'Plus Jakarta Sans',sans-serif}
+.editor-field textarea{min-height:64px;resize:vertical;line-height:1.5}
+.editor-field small{display:block;font:10px/1.5 'Plus Jakarta Sans',sans-serif;color:var(--muted);margin-top:4px}
+.editor-field input[type=color]{height:38px;padding:3px}
+.editor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.editor-actions .btn{flex:0 0 auto}
+.editor-status{font:11px/1.6 'Plus Jakarta Sans',sans-serif;color:#c7c0ff;margin-top:10px;min-height:17px}
+.editor-help{font:11px/1.6 'Plus Jakarta Sans',sans-serif;color:var(--muted);margin:0 0 10px}
+.star-list{max-height:140px;overflow:auto;font:11px 'Plus Jakarta Sans',sans-serif;color:var(--muted);line-height:1.8}
+.star-list button{margin-left:8px;font:10px 'Plus Jakarta Sans',sans-serif;background:transparent;border:1px solid var(--line);border-radius:5px;color:var(--ink);cursor:pointer}
+
+@media(max-width:900px){
+  .editor-grid{grid-template-columns:1fr}
+  .editor-map{min-height:260px}
+}
+
+/* FREE TEXT TOOL */
+.editor-card.wide{grid-column:1/-1}
+.text-tool-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:14px;align-items:start}
+.editor-field input:disabled,.editor-field textarea:disabled,.editor-field select:disabled{opacity:.35;cursor:not-allowed}
+#editorMap [data-text-id] text{user-select:none;-webkit-user-select:none}
+@media(max-width:900px){.text-tool-row{grid-template-columns:1fr}}
+  
+</style>
+</head>
+<body>
+<main class="app">
+  <header>
+    <div class="kicker">ASTRARIUM OBSERVATORY</div>
+    <h1 id="siteTitle">THE STELLAR TRACES</h1>
+    <div class="subtitle">Discover what star conceal.</div>
+  </header>
+  <div class="topline"><span>OBSERVATION FIELD 01</span><i class="pip"></i><span>NORTHEN HEMISPHERE</span></div>
+  <div class="admin-entry" id="adminEntry"><button class="btn small" id="openEditorBtn">⚙ Game Editor</button></div>
+
+  <section class="welcome panel" id="welcome">
+    <div class="sigil">✦</div>
+    <div class="eyebrow">Welcome Observer</div>
+    <p id="welcomeText">A new patch of the night sky awaits your discovery. Find the pattern among the stars and connect them in the order you believe is right.</p>
+    <div class="name-wrap">
+      <label for="observerName">Observer name</label>
+      <input id="observerName" type="text" maxlength="60" placeholder="Enter your full name (vault code)" autocomplete="name">
+    </div>
+    <button class="btn primary" id="beginBtn">Begin Observation</button>
+    <div class="fineprint">Your name will appear on the observation record.<br>All displayed times use Western Indonesia Time (WIB).</div>
+  </section>
+
+  <section class="game" id="game">
+    <div class="game-meta">
+      <div class="player">OBSERVER <span id="playerName">—</span></div>
+      <div class="stats">
+        <div class="stat">WIB <strong id="clock">—</strong></div>
+        <div class="stat">DATE <strong id="date">—</strong></div>
+        <div class="stat">TIME REMAINING <strong id="countdown">—</strong></div>
+      </div>
+    </div>
+    <div class="section-title">
+      <h2 id="gameHeading">THE UNCHARTED SKY</h2>
+      <p id="gameSubheading">Connect the stars · Trust your observation</p>
+    </div>
+    <div class="map-shell">
+      <div class="map-label" id="mapLabel">Observation Field · 01</div>
+      <div class="map-hint">SELECT TWO STARS<br>TO DRAW A LINE</div>
+      <svg id="starMap" viewBox="0 0 1000 562.5" preserveAspectRatio="xMidYMid meet" aria-label="Interactive star map"></svg>
+    </div>
+    <div class="map-footer">
+      <div class="color-picker"><span>Line colour</span>
+        <button class="swatch active" data-color="#ffffff" aria-label="White line"></button>
+        <button class="swatch" data-color="#0055ff" aria-label="Dark Blue line"></button>
+        <button class="swatch" data-color="#00ff66" aria-label="Neon Green line"></button>
+        <button class="swatch" data-color="#ff2a6d" aria-label="Neon Red line"></button>
+        <button class="swatch" data-color="#ffe600" aria-label="Neon Yellow line"></button>
+      </div>
+      <button class="btn small" id="helpBtn">How to Play</button>
+    </div>
+    <div class="controls">
+      <button class="btn" id="undoBtn">Undo Line</button>
+      <button class="btn" id="clearBtn">Clear Map</button>
+      <button class="btn" id="musicBtn">♫ Ambience: Off</button>
+      <button class="btn primary" id="submitBtn">Submit Observation</button>
+    </div>
+    <div class="modal-backdrop" id="resultModal" role="dialog" aria-modal="true" aria-labelledby="feedbackTitle">
+      <div class="modal result-modal-content">
+        <div class="feedback panel active" id="feedback" aria-live="polite">
+          <h3 id="feedbackTitle">Observation Received</h3>
+          <p id="feedbackText"></p>
+          <div class="stamp" id="feedbackStamp"></div>
+          <div class="controls" id="feedbackControls"></div>
+        </div>
+      </div>
+    </div>
+    <div class="below">
+      <div class="info-card panel">
+        <h3>HINT</h3>
+        <p id="skyUpdateText">Several stars appear brighter than the rest, but brightness alone may not reveal the pattern. Observe their positions before drawing your lines.</p>
+      </div>
+      <div class="info-card panel">
+        <h3>SKY UPDATES</h3>
+        <p id="fieldNotesText">Lines are only checked after you submit. If your first attempt is incorrect, you may adjust the map and try again before time runs out.</p>
+      </div>
+    </div>
+  </section>
+  <div class="footer">Advanced Astronomy Class · Aodhan Wynndale</div>
+</main>
+
+<div class="editor-backdrop" id="editorBackdrop" role="dialog" aria-modal="true" aria-labelledby="editorTitle">
+ <div class="editor">
+  <div class="editor-head">
+    <div><div class="eyebrow">Private setup · Visual Canvas</div><h2 id="editorTitle">GAME EDITOR</h2></div>
+    <button class="btn" id="closeEditorBtn">Close Editor</button>
+  </div>
+  
+  <section class="editor-map-container">
+    <h3>01 · STAR MAP CANVAS (Visual Plotter)</h3>
+    <p class="editor-help">Klik bintang lalu geser untuk memindahkan. Gunakan tombol di bawah untuk kontrol cepat.</p>
+    <div class="editor-map">
+      <svg id="editorMap" viewBox="0 0 1000 562.5" preserveAspectRatio="none"></svg>
+    </div>
+    <div class="editor-actions">
+      <button class="btn small primary" id="addStarBtn">＋ Add Star</button>
+      <button class="btn small primary" id="addTextBtn">＋ Add Text</button>
+      <button class="btn small" id="deleteStarBtn">Delete Selected</button>
+      <button class="btn small" id="clearAllStarsBtn">Clear All Stars</button>
+      <button class="btn small" id="cancelAddStarBtn">Cancel Add</button>
+      <button class="btn small" id="answerModeBtn" style="margin-left:auto">Answer Mode: Off</button>
+      <button class="btn small" id="savePatternBtn">Save Pattern</button>
+      <button class="btn small" id="clearAnswerBtn">Clear Lines</button>
+    </div>
+    <div class="editor-status" id="answerStatus"></div>
+  </section>
+
+  <div class="editor-grid">
+   <section class="editor-card">
+    <h3>02 · STAR & ANSWER CONTROLS</h3>
+    <div class="editor-field"><label for="cfgStarColor">Selected star colour</label><input id="cfgStarColor" type="color" value="#eeeaff"></div>
+    <div class="editor-field"><label for="cfgStarSize">Selected star size</label><input id="cfgStarSize" type="range" min="2" max="10" step="0.5" value="4.2"></div>
+    <div class="editor-field"><label for="cfgGuideFile">Upload Gambar Guide (Lokal/Laptop)</label><input id="cfgGuideFile" type="file" accept="image/*"><small>Gambar ini hanya pembantu visual di editor & tidak terlihat pemain.</small></div>
+    <div class="editor-field"><label for="cfgGuideZoom">Guide Zoom · <span id="guideZoomValue">100%</span></label><input id="cfgGuideZoom" type="range" min="0.5" max="2.5" step="0.05" value="1"></div>
+    <div class="editor-field"><label for="cfgGuideX">Guide Position · Horizontal</label><input id="cfgGuideX" type="range" min="-500" max="500" step="5" value="0"></div>
+    <div class="editor-field"><label for="cfgGuideY">Guide Position · Vertical</label><input id="cfgGuideY" type="range" min="-281" max="281" step="5" value="0"></div>
+    <div class="editor-actions"><button class="btn small" id="resetGuideBtn">Reset Guide Position</button></div>
+    <small class="editor-help">Atur zoom, lalu geser posisi gambar sampai bintang pada guide sejajar dengan canvas.</small>
+    <div class="editor-field"><label for="cfgPatternSelect">Saved accepted patterns</label><select id="cfgPatternSelect"></select></div>
+    <div class="editor-actions"><button class="btn small" id="deletePatternBtn">Delete Pattern</button><button class="btn small" id="loadPatternBtn">Load Pattern to Edit</button></div>
+    <div class="star-list" id="starList" style="margin-top:10px"></div>
+   </section>
+
+   <section class="editor-card">
+    <h3>03 · GAME DETAILS</h3>
+    <div class="editor-field"><label for="cfgSiteTitle">Judul utama website</label><input id="cfgSiteTitle" type="text" maxlength="80"></div>
+    <div class="editor-field"><label for="cfgWelcomeText">Teks sambutan pemain</label><textarea id="cfgWelcomeText" maxlength="500"></textarea></div>
+    <div class="editor-field"><label for="cfgTitle">Judul peta</label><input id="cfgTitle" type="text" maxlength="80"></div>
+    <div class="editor-field"><label for="cfgSubheading">Subjudul</label><input id="cfgSubheading" type="text" maxlength="120"></div>
+    <div class="editor-field"><label for="cfgMapLabel">Label peta</label><input id="cfgMapLabel" type="text" maxlength="80"></div>
+    <div class="editor-field"><label for="cfgSkyUpdate">HINT</label><textarea id="cfgSkyUpdate" maxlength="500"></textarea></div>
+    <div class="editor-field"><label for="cfgFieldNotes">SKY UPDATES</label><textarea id="cfgFieldNotes" maxlength="500"></textarea></div>
+   </section>
+
+   <section class="editor-card">
+    <h3>04 · SCHEDULE & PUBLISH</h3>
+    <div class="editor-field"><label for="cfgOpens">Tanggal & jam mulai</label><input id="cfgOpens" type="text" placeholder="2026-10-20 19:00"><small>Format YYYY-MM-DD HH:mm (WIB).</small></div>
+    <div class="editor-field"><label for="cfgCloses">Tanggal & jam berakhir</label><input id="cfgCloses" type="text" placeholder="2026-10-25 19:00"><small>Waktu penutupan otomatis.</small></div>
+    <div class="editor-field"><label for="cfgDuration">Durasi per pemain (menit; 0 = bebas)</label><input id="cfgDuration" type="number" min="0" max="10080" step="1"></div>
+    <div class="editor-field"><label for="cfgLineColor">Warna garis default</label><input id="cfgLineColor" type="color"></div>
+   </section>
+
+     <section class="editor-card wide">
+    <h3>05 · FREE TEXT</h3>
+    <p class="editor-help">Klik "＋ Add Text", lalu klik di peta. Klik teks untuk memilih, geser untuk memindahkan. Enter di kolom teks = baris baru. Titik posisi teks ada di sisi kiri / tengah / kanan sesuai alignment.</p>
+    <div class="text-tool-row">
+      <div class="editor-field"><label for="cfgTextContent">Isi teks</label><textarea id="cfgTextContent" disabled></textarea></div>
+      <div class="editor-field"><label for="cfgTextSize">Ukuran · <span id="textSizeValue">28</span></label><input id="cfgTextSize" type="range" min="8" max="120" step="1" value="28" disabled></div>
+      <div class="editor-field"><label for="cfgTextColor">Warna</label><input id="cfgTextColor" type="color" value="#eeeaff" disabled></div>
+      <div class="editor-field"><label for="cfgTextAlign">Alignment</label>
+        <select id="cfgTextAlign" disabled>
+          <option value="start">Kiri</option>
+          <option value="middle">Tengah</option>
+          <option value="end">Kanan</option>
+        </select>
+      </div>
+    </div>
+    <div class="editor-actions">
+      <button class="btn small" id="deleteTextBtn">Delete Text</button>
+      <button class="btn small" id="cancelAddTextBtn">Cancel Add</button>
+    </div>
+    <div class="editor-status" id="textStatus"></div>
+   </section>
+  </div>
+
+  <div class="editor-actions" style="margin-top:18px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px">
+    <button class="btn primary" id="saveDraftBtn">Save Draft</button>
+    <button class="btn" id="exportConfigBtn">Export Config JSON</button>
+    <button class="btn" id="exportPlayerBtn">Export Player HTML</button>
+    <button class="btn" id="importConfigBtn">Import Config JSON</button>
+    <input id="importConfigFile" type="file" accept="application/json,.json" hidden>
+    <button class="btn" id="resetConfigBtn">Reset Demo</button>
+  </div>
+  <div class="editor-status" id="editorStatus" aria-live="polite"></div>
+ </div>
+</div>
+
+<div class="modal-backdrop" id="helpModal" role="dialog" aria-modal="true" aria-labelledby="helpTitle">
+  <div class="modal">
+    <h2 id="helpTitle">How to Play</h2>
+    <ul>
+      <li>Connect the stars by tapping or clicking two stars in sequence.</li>
+      <li>Remove lines by tapping or clicking them. Use Undo Line to remove the last line or Clear Map to start over.</li>
+      <li>Choose a line colour before drawing. Line colours do not affect your answer.</li>
+      <li>Check the star colours. They mark the three brightest stars in order: Blue (1st), Orange (2nd), and Red (3rd).</li>
+      <li>Submit your observation when you are ready. Your answer will only be checked after you press Submit Observation.</li>
+      <li>Revise if needed. If your pattern is incorrect, adjust your lines and submit again before the timer runs out.</li>
+      <li>Looking for a reference? Go to <a href="https://www.go-astronomy.com/constellations.htm" target="_blank" style="color: #c7c0ff; text-decoration: underline;">here</a>.</li>
+    </ul>
+    <button class="btn primary" id="closeHelp">Return to the Sky</button>
+  </div>
+</div>
+
+<script>
+const DEFAULT_CONFIG = {
+  siteTitle: "CONSTELLATION CONNECT",
+  welcomeText: "A new patch of the night sky awaits your discovery. Find the pattern among the stars and connect them in the order you believe is right.",
+  title: "THE UNCHARTED SKY",
+  subheading: "Connect the stars · Trust your observation",
+  mapLabel: "Observation Field · 01",
+  skyUpdate: "Several stars appear brighter than the rest, but brightness alone may not reveal the pattern. Observe their positions before drawing your lines.",
+  fieldNotes: "Lines are only checked after you submit. If your first attempt is incorrect, you may adjust the map and try again before the observation window closes.",
+  opensAt: "",
+  closesAt: "",
+  durationMinutes: 0,
+  lineColor: "#ffffff",
+  guideImage: "",
+  guideScale: 1,
+  guideX: 0,
+  guideY: 0,
+  texts: [],
+  stars: [
+    {id:"s1",x:210,y:190,r:4.2,c:"#eeeaff"},{id:"s2",x:335,y:245,r:5.2,c:"#c7c0ff"},
+    {id:"s3",x:460,y:300,r:3.7,c:"#eeeaff"},{id:"s4",x:585,y:265,r:4.6,c:"#eeeaff"},
+    {id:"s5",x:720,y:345,r:5.1,c:"#b9caff"},{id:"s6",x:420,y:145,r:3.8,c:"#eeeaff"},
+    {id:"s7",x:555,y:115,r:4.3,c:"#eeeaff"},{id:"s8",x:780,y:175,r:3.2,c:"#eeeaff"},
+    {id:"s9",x:275,y:390,r:3.3,c:"#eeeaff"},{id:"s10",x:655,y:430,r:3.4,c:"#eeeaff"},
+    {id:"s11",x:145,y:330,r:2.8,c:"#eeeaff"},{id:"s12",x:840,y:300,r:2.8,c:"#eeeaff"},
+    {id:"s13",x:510,y:390,r:2.8,c:"#eeeaff"},{id:"s14",x:365,y:90,r:2.8,c:"#eeeaff"}
+  ],
+  acceptedPatterns: [
+    [["s1","s2"],["s2","s3"],["s3","s4"],["s4","s5"],["s2","s6"],["s6","s7"]]
+  ]
+};
+const STORAGE_KEY = "constellationConnectDraftV2";
+let config = loadDraftConfig() || structuredClone(DEFAULT_CONFIG);
+if(!Array.isArray(config.texts))config.texts=[];
+
+function loadDraftConfig(){try{const v=localStorage.getItem(STORAGE_KEY);return v?JSON.parse(v):null}catch(e){return null}}
+function persistDraft(){try{localStorage.setItem(STORAGE_KEY,JSON.stringify(config));return true}catch(e){return false}}
+
+(async function fetchExternalConfig() {
+  try {
+    const res = await fetch("cobajosjis.json?v=" + Date.now());
+    if (res.ok) {
+      const remoteConfig = await res.json();
+      if (!loadDraftConfig()) {
+        config = { ...structuredClone(DEFAULT_CONFIG), ...remoteConfig };
+        applyConfigToPage();
+        drawMap();
+      }
+    }
+  } catch (e) {}
+})();
+
+const NS = "http://www.w3.org/2000/svg";
+const svg = document.getElementById("starMap");
+const welcome = document.getElementById("welcome");
+const game = document.getElementById("game");
+const nameInput = document.getElementById("observerName");
+const feedback = document.getElementById("feedback");
+const feedbackControls = document.getElementById("feedbackControls");
+
+let stars = config.stars;
+let selectedStar = null;
+let edges = [];
+let lineColor = "#ffffff";
+let observer = "";
+let startedAt = null;
+let endsAt = null;
+let selectedEditorStar = null;
+let addingStar = false;
+let answerMode = false;
+let answerEdges = [];
+let dragStarId = null;
+let activePatternIndex = 0;
+let windowClosed = false;
+let timerHandle = null;
+let submitted = false;
+let ambienceAudio = null;
+
+function el(tag, attrs={}) {
+  const node = document.createElementNS(NS, tag);
+  Object.entries(attrs).forEach(([key,value])=>node.setAttribute(key,value));
+  return node;
+}
+function edgeKey(a,b){return [a,b].sort().join("|")}
+function starById(id){return stars.find(s=>s.id===id)}
+function appendBackgroundStars(){
+  for(let i=0;i<100;i++){
+    const x=(i*137.51+23)%1000, y=(i*79.37+17)%562.5;
+    const circle=el("circle",{cx:x,cy:y,r:(i%5===0?1.15:.55),fill:"#fff",opacity:(i%4===0?.42:.18)});
+    svg.appendChild(circle);
+  }
+}
+function drawMap(){
+  svg.innerHTML="";
+  appendBackgroundStars();
+  appendTexts(svg);
+  edges.forEach(edge=>{
+    const a=starById(edge.a), b=starById(edge.b);
+    if(!a||!b)return;
+    const line=el("line",{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:edge.color,class:"user-line"});
+    line.addEventListener("click",()=>{if(!submitted){edges=edges.filter(e=>edgeKey(e.a,e.b)!==edgeKey(edge.a,edge.b));drawMap();}});
+    svg.appendChild(line);
+  });
+  stars.forEach(s=>{
+    const group=el("g",{class:"star-point",tabindex:"0",role:"button","aria-label":"Star "+s.id});
+    const halo=el("circle",{cx:s.x,cy:s.y,r:s.r*3.5,fill:s.c,opacity:.06});
+    const glow=el("circle",{cx:s.x,cy:s.y,r:s.r*1.8,fill:s.c,opacity:.13});
+    const core=el("circle",{cx:s.x,cy:s.y,r:s.r,fill:s.c,opacity:.95});
+    group.append(halo,glow,core);
+    if(selectedStar===s.id){
+      group.appendChild(el("circle",{cx:s.x,cy:s.y,r:s.r*2.6,fill:"none",stroke:"#fff","stroke-width":1.1,opacity:.9}));
+    }
+    group.addEventListener("click",()=>handleStar(s.id));
+    group.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();handleStar(s.id)}});
+    svg.appendChild(group);
+  });
+}
+function handleStar(id){
+  if(submitted || isExpired())return;
+  if(!selectedStar){selectedStar=id;drawMap();return}
+  if(selectedStar===id){selectedStar=null;drawMap();return}
+  const key=edgeKey(selectedStar,id);
+  if(!edges.some(e=>edgeKey(e.a,e.b)===key)) edges.push({a:selectedStar,b:id,color:lineColor});
+  selectedStar=null;drawMap();
+}
+function currentWIBParts(){
+  const parts = new Intl.DateTimeFormat("en-CA",{
+    timeZone:"Asia/Jakarta",year:"numeric",month:"2-digit",day:"2-digit",
+    hour:"2-digit",minute:"2-digit",second:"2-digit",hourCycle:"h23"
+  }).formatToParts(new Date());
+  return Object.fromEntries(parts.map(p=>[p.type,p.value]));
+}
+function nowWIBString(){
+  const p=currentWIBParts();
+  return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}:${p.second} WIB`;
+}
+function updateClock(){
+  const p=currentWIBParts();
+  document.getElementById("clock").textContent=`${p.hour}:${p.minute}:${p.second}`;
+  document.getElementById("date").textContent=`${p.day}.${p.month}.${p.year}`;
+}
+function wibDateToTimestamp(value){
+  if(!value)return null;
+  const normalized=String(value).trim().replace(" ","T");
+  if(!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}(:\d{2})?$/.test(normalized))return null;
+  return new Date((normalized.length===16?normalized+":00":normalized)+"+07:00").getTime();
+}
+function scheduleState(){
+  const now=Date.now(), open=wibDateToTimestamp(config.opensAt), close=wibDateToTimestamp(config.closesAt);
+  if(!open || !close)return {ok:true};
+  if(now<open)return {ok:false,message:"This star map has not opened yet. Return when the observation window begins."};
+  if(now>=close)return {ok:false,message:"This star map is closed. The observation window has ended."};
+  return {ok:true};
+}
+function isExpired(){return endsAt!==null && Date.now()>=endsAt}
+function formatRemaining(seconds){
+  seconds=Math.max(0,seconds|0);
+  const d=Math.floor(seconds/86400),h=Math.floor((seconds%86400)/3600),m=Math.floor((seconds%3600)/60),s=seconds%60; return `${d}d ${String(h).padStart(2,"0")}h ${String(m).padStart(2,"0")}m ${String(s).padStart(2,"0")}s`;
+}
+function updateCountdown(){
+  const close=wibDateToTimestamp(config.closesAt);
+  const deadline=close || endsAt;
+  if(!deadline){document.getElementById("countdown").textContent="OPEN";return;}
+  const seconds=Math.ceil((deadline-Date.now())/1000);
+  document.getElementById("countdown").textContent=formatRemaining(seconds);
+  if(seconds<=0){
+    document.getElementById("countdown").textContent="CLOSED";
+    if(windowClosed)return; windowClosed=true;
+    stopAmbience();
+    document.getElementById("submitBtn").disabled=true;
+    document.getElementById("undoBtn").disabled=true;
+    document.getElementById("clearBtn").disabled=true;
+    selectedStar=null;
+    if(!submitted)showFeedback("Observation Window Ended","The observation window has closed. Your current map can no longer be changed or submitted.",false);
+    clearInterval(timerHandle);
+  }
+}
+function begin(){
+  const schedule=scheduleState();
+  if(!schedule.ok){showGateMessage(schedule.message);return}
+  const value=nameInput.value.trim();
+  if(!value){nameInput.focus();nameInput.style.borderColor="#ff9a9a";return}
+  observer=value;
+  document.getElementById("playerName").textContent=observer;
+  welcome.style.display="none";game.classList.add("active");
+  startedAt=Date.now();endsAt=config.durationMinutes>0?startedAt+(config.durationMinutes*60)*1000:null;
+  drawMap();updateClock();updateCountdown();
+  timerHandle=setInterval(()=>{updateClock();updateCountdown();},250);
+}
+function showGateMessage(message){
+  const backdrop=document.getElementById("helpModal");
+  document.getElementById("helpTitle").textContent="Observation Window";
+  const list=backdrop.querySelector("ul"); if(list)list.hidden=true;
+  let p=backdrop.querySelector(".gate-message");
+  if(!p){p=document.createElement("p");p.className="gate-message";backdrop.querySelector(".modal").insertBefore(p,backdrop.querySelector(".btn"))}
+  p.textContent=message;
+  backdrop.classList.add("active");
+}
+function showFeedback(title,message,allowRetry){
+  const resultModal=document.getElementById("resultModal");
+  feedback.classList.add("active");
+  document.getElementById("feedbackTitle").textContent=title;
+  document.getElementById("feedbackText").textContent=message;
+  document.getElementById("feedbackStamp").textContent=`${observer} · ${nowWIBString()}`;
+  feedbackControls.innerHTML="";
+  if(allowRetry){
+    const retry=document.createElement("button");retry.className="btn primary";retry.textContent="Revise Observation";
+    retry.addEventListener("click",()=>{resultModal.classList.remove("active");feedback.classList.remove("active");submitted=false;document.getElementById("submitBtn").disabled=false;document.getElementById("undoBtn").disabled=false;document.getElementById("clearBtn").disabled=false;drawMap();});
+    feedbackControls.appendChild(retry);
+  }else{
+    const done=document.createElement("button");done.className="btn";done.textContent="Return to the Sky";
+    done.addEventListener("click",()=>{resultModal.classList.remove("active");if(title.includes("PATTERN CONFIRMED"))stopAmbience();});
+    feedbackControls.appendChild(done);
+  }
+  resultModal.classList.add("active");
+}
+
+function normalisePattern(pattern){return pattern.map(pair=>edgeKey(pair[0],pair[1])).sort()}
+function submit(){
+  if(isExpired()||submitted)return;
+  const schedule=scheduleState();
+  if(!schedule.ok){showFeedback("Observation Window Closed",schedule.message,false);return}
+  const current=edges.map(e=>edgeKey(e.a,e.b)).sort();
+  const correct=config.acceptedPatterns.some(pattern=>{
+    const expected=normalisePattern(pattern);
+    return expected.length===current.length && expected.every((v,i)=>v===current[i]);
+  });
+  submitted=true;
+  if(correct){
+    stopAmbience();
+    showFeedback("⊹₊.PATTERN CONFIRMED.₊⊹","The stars align as expected. Keep this record to mark your completed observation.",false);
+  }else{
+    showFeedback("⸮⸮PATTERN UNCONFIRMED??","The stars do not align as expected. Your lines are still here, so make your adjustments and try again.",true);
+  }
+}
+function setLineColor(color){
+  lineColor=color;
+  document.querySelectorAll(".swatch").forEach(btn=>btn.classList.toggle("active",btn.dataset.color===color));
+}
+function stopAmbience(){
+  if(ambienceAudio){
+    ambienceAudio.pause();
+    ambienceAudio.currentTime=0;
+  }
+  document.getElementById("musicBtn").textContent="♫ Ambience: Off";
+}
+async function toggleAmbience(){
+  if(!ambienceAudio){
+    ambienceAudio=new Audio("audio/Dark%20Academia.mp3");
+    ambienceAudio.loop=true;
+    ambienceAudio.volume=0.45;
+  }
+  if(!ambienceAudio.paused){
+    stopAmbience();
+    return;
+  }
+  try{
+    await ambienceAudio.play();
+    document.getElementById("musicBtn").textContent="♫ Ambience: On";
+  }catch(e){
+    document.getElementById("musicBtn").textContent="♫ Ambience: Off";
+    alert("Ambient audio could not be played. Please check that audio/Dark Academia.mp3 exists in the repository.");
+  }
+}
+
+document.getElementById("beginBtn").addEventListener("click",begin);
+nameInput.addEventListener("keydown",e=>{if(e.key==="Enter")begin()});
+document.getElementById("submitBtn").addEventListener("click",submit);
+document.getElementById("undoBtn").addEventListener("click",()=>{if(!submitted&&!isExpired()&&edges.length){edges.pop();selectedStar=null;drawMap()}});
+document.getElementById("clearBtn").addEventListener("click",()=>{if(!submitted&&!isExpired()){edges=[];selectedStar=null;drawMap()}});
+document.getElementById("musicBtn").addEventListener("click",toggleAmbience);
+document.querySelectorAll(".swatch").forEach(btn=>btn.addEventListener("click",()=>setLineColor(btn.dataset.color)));
+const helpModal=document.getElementById("helpModal");
+document.getElementById("helpBtn").addEventListener("click",()=>{document.getElementById("helpTitle").textContent="How to Play";const list=helpModal.querySelector("ul");if(list)list.hidden=false;helpModal.querySelector(".gate-message")?.remove();helpModal.classList.add("active")});
+document.getElementById("closeHelp").addEventListener("click",()=>helpModal.classList.remove("active"));
+helpModal.addEventListener("click",e=>{if(e.target===helpModal)helpModal.classList.remove("active")});
+const resultModal=document.getElementById("resultModal");
+resultModal.addEventListener("click",e=>{if(e.target===resultModal)resultModal.classList.remove("active")});
+
+const editorBackdrop=document.getElementById("editorBackdrop");
+const editorSvg=document.getElementById("editorMap");
+const editorStatus=document.getElementById("editorStatus");
+const answerStatus=document.getElementById("answerStatus");
+const isEditorRoute=new URLSearchParams(location.search).get("editor")==="1";
+
+function applyConfigToPage(){
+  document.getElementById("siteTitle").textContent=config.siteTitle||"CONSTELLATION CONNECT";
+  document.getElementById("welcomeText").innerHTML=(config.welcomeText||"").replace(/\n/g,"<br>");
+  document.getElementById("gameHeading").textContent=config.title;
+  document.getElementById("gameSubheading").textContent=config.subheading;
+  document.getElementById("mapLabel").textContent=config.mapLabel;
+  document.getElementById("skyUpdateText").innerHTML=(config.skyUpdate||"").replace(/\n/g,"<br>");
+  document.getElementById("fieldNotesText").innerHTML=(config.fieldNotes||"").replace(/\n/g,"<br>");
+  lineColor=config.lineColor||"#ffffff";
+  document.querySelectorAll(".swatch").forEach(b=>b.classList.toggle("active",b.dataset.color===lineColor));
+  stars=config.stars;
+  document.getElementById("countdown").textContent="OPEN";
+}
+function editorField(id){return document.getElementById(id)}
+function fillEditorFields(){
+  editorField("cfgSiteTitle").value=config.siteTitle||"CONSTELLATION CONNECT";
+  editorField("cfgWelcomeText").value=config.welcomeText||"";
+  editorField("cfgTitle").value=config.title;editorField("cfgSubheading").value=config.subheading;
+  editorField("cfgMapLabel").value=config.mapLabel;editorField("cfgSkyUpdate").value=config.skyUpdate;
+  editorField("cfgFieldNotes").value=config.fieldNotes;editorField("cfgOpens").value=config.opensAt||"";
+  editorField("cfgCloses").value=config.closesAt||"";editorField("cfgDuration").value=config.durationMinutes||0;
+  editorField("cfgLineColor").value=config.lineColor||"#ffffff";
+  editorField("cfgGuideZoom").value=config.guideScale??1;
+  editorField("cfgGuideX").value=config.guideX??0;
+  editorField("cfgGuideY").value=config.guideY??0;
+  editorField("guideZoomValue").textContent=Math.round((config.guideScale??1)*100)+"%";
+  renderEditorMap();renderStarList();renderPatternSelect();
+}
+function readEditorFields(){
+  config.siteTitle=editorField("cfgSiteTitle").value.trim()||"CONSTELLATION CONNECT";
+  config.welcomeText=editorField("cfgWelcomeText").value;
+  config.title=editorField("cfgTitle").value.trim()||"THE UNCHARTED SKY";
+  config.subheading=editorField("cfgSubheading").value.trim();config.mapLabel=editorField("cfgMapLabel").value.trim();
+  config.skyUpdate=editorField("cfgSkyUpdate").value;config.fieldNotes=editorField("cfgFieldNotes").value;
+  config.opensAt=editorField("cfgOpens").value.trim().replace("T"," ");config.closesAt=editorField("cfgCloses").value.trim().replace("T"," ");
+  config.durationMinutes=Math.max(0,Number(editorField("cfgDuration").value)||0);
+  config.lineColor=editorField("cfgLineColor").value||"#ffffff";
+  config.stars=stars;
+}
+
+function renderEditorMap(){
+  editorSvg.innerHTML="";
+  if (config.guideImage) {
+    const scale=Number(config.guideScale)||1;
+    const width=1000*scale, height=562.5*scale;
+    const guideImg = el("image", {
+      href: config.guideImage,
+      x: (1000-width)/2+(Number(config.guideX)||0),
+      y: (562.5-height)/2+(Number(config.guideY)||0),
+      width, height,
+      preserveAspectRatio: "xMidYMid meet",
+      opacity: 0.38
+    });
+    editorSvg.appendChild(guideImg);
+  }
+  for(let i=0;i<55;i++){const x=(i*137.51+23)%1000,y=(i*79.37+17)%562.5;editorSvg.appendChild(el("circle",{cx:x,cy:y,r:i%5===0?1.1:.55,fill:"#fff",opacity:.2}))}
+  if(answerMode){answerEdges.forEach(e=>{const a=starById(e[0]),b=starById(e[1]);if(a&&b)editorSvg.appendChild(el("line",{x1:a.x,y1:a.y,x2:b.x,y2:b.y,stroke:"#c7c0ff","stroke-width":2.4,opacity:.85}))})}
+  stars.forEach(s=>{
+    const g=el("g",{cursor:"move","data-star-id":s.id});
+    if(selectedEditorStar===s.id)g.appendChild(el("circle",{cx:s.x,cy:s.y,r:s.r*3.2,fill:"none",stroke:"#fff","stroke-width":1.5}));
+    g.appendChild(el("circle",{cx:s.x,cy:s.y,r:s.r*1.9,fill:s.c,opacity:.16}));g.appendChild(el("circle",{cx:s.x,cy:s.y,r:s.r,fill:s.c}));
+    const txt=el("text",{x:s.x+10,y:s.y-9,fill:"#bfbadf","font-size":12,"font-family":"'Plus Jakarta Sans', sans-serif",opacity:.7});txt.textContent=s.id;g.appendChild(txt);
+    g.addEventListener("pointerdown",ev=>{ev.preventDefault();try{editorSvg.setPointerCapture(ev.pointerId)}catch(e){}selectedEditorStar=s.id;dragStarId=s.id;renderEditorMap();renderStarList();if(answerMode){handleAnswerStar(s.id);dragStarId=null;}});
+    editorSvg.appendChild(g);
+  });
+}
+
+function svgCoords(ev){const r=editorSvg.getBoundingClientRect();return {x:Math.max(12,Math.min(988,(ev.clientX-r.left)/r.width*1000)),y:Math.max(12,Math.min(550,(ev.clientY-r.top)/r.height*562.5))}}
+editorSvg.addEventListener("pointermove",ev=>{if(!dragStarId||answerMode)return;const p=svgCoords(ev),s=starById(dragStarId);if(s){s.x=Math.round(p.x);s.y=Math.round(p.y);renderEditorMap()}});
+editorSvg.addEventListener("pointerup",()=>{if(dragStarId){dragStarId=null;persistDraft()}});
+editorSvg.addEventListener("pointercancel",()=>{dragStarId=null});
+editorSvg.addEventListener("click",ev=>{if(!addingStar||answerMode||ev.target.closest("[data-star-id]"))return;const p=svgCoords(ev);const n=stars.length+1;let id="s"+n;while(starById(id))id="s"+(Number(id.slice(1))+1);stars.push({id,x:Math.round(p.x),y:Math.round(p.y),r:3.8,c:"#eeeaff"});config.stars=stars;selectedEditorStar=id;addingStar=false;editorField("addStarBtn").textContent="＋ Add Star";renderEditorMap();renderStarList();persistDraft()});
+
+function renderStarList(){const list=editorField("starList");list.innerHTML="";stars.forEach(s=>{const row=document.createElement("div");row.textContent=`${s.id} · x ${Math.round(s.x)}, y ${Math.round(s.y)}`;const b=document.createElement("button");b.textContent="Select";b.addEventListener("click",()=>selectEditorStar(s.id));row.appendChild(b);list.appendChild(row)})}
+function selectEditorStar(id){selectedEditorStar=id;const s=starById(id);if(s){editorField("cfgStarColor").value=s.c;editorField("cfgStarSize").value=s.r}renderEditorMap();renderStarList()}
+
+editorField("cfgStarColor").addEventListener("input",()=>{const s=starById(selectedEditorStar);if(s){s.c=editorField("cfgStarColor").value;renderEditorMap();persistDraft()}});
+editorField("cfgStarSize").addEventListener("input",()=>{const s=starById(selectedEditorStar);if(s){s.r=Number(editorField("cfgStarSize").value);renderEditorMap();renderStarList();persistDraft()}});
+editorField("addStarBtn").addEventListener("click",()=>{addingStar=!addingStar;editorField("addStarBtn").textContent=addingStar?"Click Map to Add Star":"＋ Add Star";editorStatus.textContent=addingStar?"Click an empty area in the map to place a new star.":""});
+editorField("cancelAddStarBtn").addEventListener("click",()=>{addingStar=false;editorField("addStarBtn").textContent="＋ Add Star"});
+editorField("deleteStarBtn").addEventListener("click",()=>{if(!selectedEditorStar){editorStatus.textContent="Select a star first.";return}const id=selectedEditorStar;stars=stars.filter(s=>s.id!==id);config.stars=stars;config.acceptedPatterns=config.acceptedPatterns.map(p=>p.filter(e=>!e.includes(id))).filter(p=>p.length);answerEdges=answerEdges.filter(e=>!e.includes(id));selectedEditorStar=null;renderEditorMap();renderStarList();renderPatternSelect();persistDraft();editorStatus.textContent=`Deleted ${id}.`});
+editorField("clearAllStarsBtn").addEventListener("click",()=>{if(!stars.length){editorStatus.textContent="There are no stars to clear.";return}if(!confirm("Clear all stars and all saved answer patterns? This will keep your guide image and other settings."))return;stars=[];config.stars=stars;config.acceptedPatterns=[];answerEdges=[];selectedEditorStar=null;selectedAnswerStar=null;addingStar=false;editorField("addStarBtn").textContent="＋ Add Star";renderEditorMap();renderStarList();renderPatternSelect();persistDraft();editorStatus.textContent="All stars and answer patterns cleared. Other settings were kept."});
+
+function updateGuideTransform(){
+  config.guideScale=Number(editorField("cfgGuideZoom").value)||1;
+  config.guideX=Number(editorField("cfgGuideX").value)||0;
+  config.guideY=Number(editorField("cfgGuideY").value)||0;
+  editorField("guideZoomValue").textContent=Math.round(config.guideScale*100)+"%";
+  renderEditorMap();
+  persistDraft();
+}
+["cfgGuideZoom","cfgGuideX","cfgGuideY"].forEach(id=>editorField(id).addEventListener("input",updateGuideTransform));
+editorField("resetGuideBtn").addEventListener("click",()=>{
+  config.guideScale=1;config.guideX=0;config.guideY=0;
+  editorField("cfgGuideZoom").value=1;editorField("cfgGuideX").value=0;editorField("cfgGuideY").value=0;
+  updateGuideTransform();
+  editorStatus.textContent="Guide position reset.";
+});
+
+editorField("cfgGuideFile").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      config.guideImage = evt.target.result;
+      renderEditorMap();
+      persistDraft();
+      editorStatus.textContent = "Gambar guide berhasil dimuat.";
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+function handleAnswerStar(id){if(!answerMode)return;if(!selectedAnswerStar){selectedAnswerStar=id;answerStatus.textContent=`Selected ${id}. Choose another star.`;return}if(selectedAnswerStar===id){selectedAnswerStar=null;return}const pair=[selectedAnswerStar,id].sort();if(!answerEdges.some(e=>e[0]===pair[0]&&e[1]===pair[1]))answerEdges.push(pair);selectedAnswerStar=null;answerStatus.textContent=`Current pattern: ${answerEdges.length} line(s).`;renderEditorMap()}
+let selectedAnswerStar=null;
+editorField("answerModeBtn").addEventListener("click",()=>{answerMode=!answerMode;selectedAnswerStar=null;editorField("answerModeBtn").textContent="Answer Mode: "+(answerMode?"On":"Off");renderEditorMap();answerStatus.textContent=answerMode?"Click two stars at a time to add answer lines.":"Answer mode is off."});
+editorField("clearAnswerBtn").addEventListener("click",()=>{answerEdges=[];selectedAnswerStar=null;renderEditorMap();answerStatus.textContent="Current answer pattern cleared."});
+editorField("savePatternBtn").addEventListener("click",()=>{if(!answerEdges.length){answerStatus.textContent="Draw at least one answer line first.";return}config.acceptedPatterns.push(answerEdges.map(e=>[...e]));activePatternIndex=config.acceptedPatterns.length-1;renderPatternSelect();persistDraft();answerStatus.textContent=`Saved pattern ${activePatternIndex+1}.`});
+
+function renderPatternSelect(){const sel=editorField("cfgPatternSelect");sel.innerHTML="";config.acceptedPatterns.forEach((p,i)=>{const o=document.createElement("option");o.value=i;o.textContent=`Pattern ${i+1} · ${p.length} lines`;sel.appendChild(o)});if(config.acceptedPatterns.length){activePatternIndex=Math.min(activePatternIndex,config.acceptedPatterns.length-1);sel.value=String(activePatternIndex)}}
+editorField("cfgPatternSelect").addEventListener("change",()=>activePatternIndex=Number(editorField("cfgPatternSelect").value));
+editorField("deletePatternBtn").addEventListener("click",()=>{if(!config.acceptedPatterns.length)return;config.acceptedPatterns.splice(activePatternIndex,1);activePatternIndex=Math.max(0,activePatternIndex-1);renderPatternSelect();persistDraft();answerStatus.textContent="Selected answer pattern deleted."});
+editorField("loadPatternBtn").addEventListener("click",()=>{answerEdges=(config.acceptedPatterns[activePatternIndex]||[]).map(e=>[...e]);answerMode=true;editorField("answerModeBtn").textContent="Answer Mode: On";renderEditorMap();answerStatus.textContent="Loaded pattern for editing."});
+
+function downloadBlob(name,blob){const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function serialisableConfig(){return JSON.stringify(config,null,2)}
+function makeExportHTML(){
+  readEditorFields();
+  let html=document.documentElement.outerHTML;
+  const escaped=JSON.stringify(config).replace(/</g,"\\u003c");
+  html=html.replace(/const DEFAULT_CONFIG = \{[\s\S]*?\};/, `const DEFAULT_CONFIG = ${escaped};`);
+  html=html.replace('class="editor-backdrop active" id="editorBackdrop"','class="editor-backdrop" id="editorBackdrop"');
+  html=html.replace('id="adminEntry" style="display: flex;"','id="adminEntry"');
+  html=html.replace('class="modal-backdrop active" id="resultModal"','class="modal-backdrop" id="resultModal"');
+  html=html.replace('class="feedback panel active" id="feedback"','class="feedback panel" id="feedback"');
+  return "<!DOCTYPE html>\n"+html;
+}
+
+function saveDraft(){readEditorFields();const ok=persistDraft();applyConfigToPage();drawMap();editorStatus.textContent=ok?"Draft saved in this browser. Export Config JSON to publish.":"Could not save local draft.";renderEditorMap();renderStarList();renderPatternSelect()}
+editorField("saveDraftBtn").addEventListener("click",saveDraft);
+editorField("exportPlayerBtn").addEventListener("click",()=>{readEditorFields();const blob=new Blob([makeExportHTML()],{type:"text/html;charset=utf-8"});downloadBlob("index.html",blob);editorStatus.textContent="Player HTML exported."});
+editorField("exportConfigBtn").addEventListener("click",()=>{readEditorFields();downloadBlob("cobajosjis.json",new Blob([serialisableConfig()],{type:"application/json;charset=utf-8"}));editorStatus.textContent="Configuration exported."});
+editorField("importConfigBtn").addEventListener("click",()=>editorField("importConfigFile").click());
+editorField("importConfigFile").addEventListener("change",async ev=>{const f=ev.target.files&&ev.target.files[0];if(!f)return;try{const v=JSON.parse(await f.text());if(!Array.isArray(v.stars)||!Array.isArray(v.acceptedPatterns))throw new Error("Invalid config");config={...structuredClone(DEFAULT_CONFIG),...v};stars=config.stars;fillEditorFields();applyConfigToPage();persistDraft();editorStatus.textContent="Config imported."}catch(e){editorStatus.textContent="Could not import config."}ev.target.value=""});
+editorField("resetConfigBtn").addEventListener("click",()=>{if(!confirm("Reset all editor changes?"))return;config=structuredClone(DEFAULT_CONFIG);stars=config.stars;answerEdges=[];selectedEditorStar=null;fillEditorFields();applyConfigToPage();persistDraft();editorStatus.textContent="Demo setup restored."});
+
+["cfgSiteTitle","cfgWelcomeText","cfgTitle","cfgSubheading","cfgMapLabel","cfgSkyUpdate","cfgFieldNotes","cfgOpens","cfgCloses","cfgDuration","cfgLineColor"].forEach(id=>editorField(id).addEventListener("change",()=>{readEditorFields();applyConfigToPage();persistDraft()}));
+/* ===== FREE TEXT TOOL ===== */
+let selectedTextId=null, addingText=false, dragTextId=null, dragTextOffset={x:0,y:0};
+const textStatus=document.getElementById("textStatus");
+function textById(id){return (config.texts||[]).find(t=>t.id===id)}
+
+function makeTextNode(t){
+  const n=el("text",{x:t.x,y:t.y,fill:t.c,"font-size":t.size,"text-anchor":t.align||"middle","font-family":"'Plus Jakarta Sans',sans-serif"});
+  String(t.text||"").split("\n").forEach((line,i)=>{
+    const ts=el("tspan",{x:t.x,dy:i?"1.2em":"0"});
+    ts.textContent=line||"\u00A0";
+    n.appendChild(ts);
+  });
+  return n;
+}
+function appendTexts(target){
+  (config.texts||[]).forEach(t=>{const n=makeTextNode(t);n.setAttribute("pointer-events","none");target.appendChild(n)});
+}
+
+function renderEditorTexts(){
+  const layer=el("g",{});
+  (config.texts||[]).forEach(t=>{
+    const grp=el("g",{"data-text-id":t.id,cursor:"move"});
+    const node=makeTextNode(t);
+    node.setAttribute("pointer-events","all");
+    grp.appendChild(node);
+    layer.appendChild(grp);
+  });
+  const firstStar=editorSvg.querySelector("[data-star-id]");
+  firstStar?editorSvg.insertBefore(layer,firstStar):editorSvg.appendChild(layer);
+  const sel=layer.querySelector(`[data-text-id="${selectedTextId}"]`);
+  if(sel){try{
+    const b=sel.getBBox();
+    sel.insertBefore(el("rect",{x:b.x-6,y:b.y-4,width:b.width+12,height:b.height+8,fill:"none",stroke:"#c7c0ff","stroke-width":1,"stroke-dasharray":"4 3",rx:3}),sel.firstChild);
+  }catch(e){}}
+}
+const baseRenderEditorMap=renderEditorMap;
+renderEditorMap=function(){baseRenderEditorMap();renderEditorTexts()};
+
+function syncTextPanel(){
+  const t=textById(selectedTextId);
+  ["cfgTextContent","cfgTextSize","cfgTextColor","cfgTextAlign"].forEach(id=>editorField(id).disabled=!t);
+  if(!t){editorField("cfgTextContent").value="";return}
+  editorField("cfgTextContent").value=t.text;
+  editorField("cfgTextSize").value=t.size;
+  editorField("textSizeValue").textContent=t.size;
+  editorField("cfgTextColor").value=t.c;
+  editorField("cfgTextAlign").value=t.align||"middle";
+}
+function selectText(id){
+  selectedTextId=id;selectedEditorStar=null;
+  renderEditorMap();renderStarList();syncTextPanel();
+}
+const baseFillEditorFields=fillEditorFields;
+fillEditorFields=function(){selectedTextId=null;baseFillEditorFields();syncTextPanel()};
+
+function setAddingText(on){
+  addingText=on;
+  if(on){addingStar=false;editorField("addStarBtn").textContent="＋ Add Star"}
+  editorField("addTextBtn").textContent=on?"Click Map to Add Text":"＋ Add Text";
+  textStatus.textContent=on?"Klik area kosong di peta untuk menaruh teks baru.":"";
+}
+editorField("addTextBtn").addEventListener("click",()=>setAddingText(!addingText));
+editorField("cancelAddTextBtn").addEventListener("click",()=>setAddingText(false));
+editorField("addStarBtn").addEventListener("click",()=>{if(addingStar)setAddingText(false)});
+
+editorSvg.addEventListener("click",ev=>{
+  if(!addingText||answerMode||ev.target.closest("[data-text-id],[data-star-id]"))return;
+  const p=svgCoords(ev);
+  let n=config.texts.length+1,id="t"+n;
+  while(textById(id)){n++;id="t"+n}
+  config.texts.push({id,x:Math.round(p.x),y:Math.round(p.y),text:"Teks baru",size:28,c:"#eeeaff",align:"middle"});
+  setAddingText(false);
+  selectText(id);
+  persistDraft();
+  textStatus.textContent="Teks ditambahkan. Edit isinya di panel 05, atau geser di peta.";
+  editorField("cfgTextContent").focus();editorField("cfgTextContent").select();
+});
+
+editorSvg.addEventListener("pointerdown",ev=>{
+  if(ev.target.closest("[data-star-id]")){
+    if(selectedTextId){selectedTextId=null;renderEditorMap();syncTextPanel()}
+    return;
+  }
+  const g=ev.target.closest("[data-text-id]");
+  if(!g||answerMode)return;
+  const t=textById(g.getAttribute("data-text-id"));
+  if(!t)return;
+  ev.preventDefault();
+  try{editorSvg.setPointerCapture(ev.pointerId)}catch(e){}
+  const p=svgCoords(ev);
+  dragTextId=t.id;dragTextOffset={x:t.x-p.x,y:t.y-p.y};
+  selectText(t.id);
+});
+editorSvg.addEventListener("pointermove",ev=>{
+  if(!dragTextId)return;
+  const t=textById(dragTextId);if(!t)return;
+  const p=svgCoords(ev);
+  t.x=Math.round(p.x+dragTextOffset.x);t.y=Math.round(p.y+dragTextOffset.y);
+  renderEditorMap();
+});
+function endTextDrag(){if(dragTextId){dragTextId=null;persistDraft()}}
+editorSvg.addEventListener("pointerup",endTextDrag);
+editorSvg.addEventListener("pointercancel",()=>{dragTextId=null});
+
+function updateSelectedText(fn){
+  const t=textById(selectedTextId);if(!t)return;
+  fn(t);renderEditorMap();persistDraft();
+}
+editorField("cfgTextContent").addEventListener("input",()=>updateSelectedText(t=>t.text=editorField("cfgTextContent").value));
+editorField("cfgTextSize").addEventListener("input",()=>updateSelectedText(t=>{t.size=Number(editorField("cfgTextSize").value);editorField("textSizeValue").textContent=t.size}));
+editorField("cfgTextColor").addEventListener("input",()=>updateSelectedText(t=>t.c=editorField("cfgTextColor").value));
+editorField("cfgTextAlign").addEventListener("change",()=>updateSelectedText(t=>t.align=editorField("cfgTextAlign").value));
+editorField("deleteTextBtn").addEventListener("click",()=>{
+  if(!textById(selectedTextId)){textStatus.textContent="Pilih teks dulu di peta.";return}
+  config.texts=config.texts.filter(t=>t.id!==selectedTextId);
+  selectedTextId=null;renderEditorMap();syncTextPanel();persistDraft();
+  textStatus.textContent="Teks dihapus.";
+});
+document.getElementById("openEditorBtn").addEventListener("click",()=>{fillEditorFields();editorBackdrop.classList.add("active")});
+document.getElementById("closeEditorBtn").addEventListener("click",()=>editorBackdrop.classList.remove("active"));
+editorBackdrop.addEventListener("click",ev=>{if(ev.target===editorBackdrop)editorBackdrop.classList.remove("active")});
+if(isEditorRoute){document.getElementById("adminEntry").style.display="flex";fillEditorFields();editorBackdrop.classList.add("active")}else{document.getElementById("adminEntry").style.display="none";editorBackdrop.classList.remove("active")}
+
+applyConfigToPage();
+updateClock();
+setInterval(()=>{updateClock();updateCountdown();},1000);
+</script>
+</body>
+</html>

@@ -1,15 +1,29 @@
 {
-  "siteTitle": "THE STELLAR TRACES",
+  "siteTitle": "CONSTELLATION CONNECT",
   "welcomeText": "A new patch of the night sky awaits your discovery. Find the pattern among the stars and connect them in the order you believe is right.",
-  "title": "NOVEMBER'S LATE AUTUMN SKY",
+  "title": "THE UNCHARTED SKY",
   "subheading": "Connect the stars · Trust your observation",
-  "mapLabel": "ST 01 20 26 11",
+  "mapLabel": "Observation Field · 01",
   "skyUpdate": "I rise from ashes, yet I am no flame.\nI bear the memory of an endless cycle.\nFar beneath the northern skies, I spread my wings.\nMy name belongs to a bird reborn through fire.\nTell me, Observer, which constellation am I?",
-  "fieldNotes": "No Update",
-  "opensAt": "2026-11-10 07:00",
+  "fieldNotes": "A distant light has begun to emerge from the velvet sky. Wurren is making its appearance.",
+  "opensAt": "2026-11-10 12:00",
   "closesAt": "2026-11-30 23:59",
   "durationMinutes": 0,
   "lineColor": "#d9d2ff",
+  "guideScale": 1,
+  "guideX": 0,
+  "guideY": 0,
+  "texts": [
+    {
+      "id": "t1",
+      "x": 509,
+      "y": 113,
+      "text": "Wurren",
+      "size": 14,
+      "c": "#6bd3ff",
+      "align": "start"
+    }
+  ],
   "stars": [
     {
       "id": "s1",
